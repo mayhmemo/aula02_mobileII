@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:todo_refatoracao_baguncado/presentation/widgets/todo_model.dart';
+import 'package:todo_refatoracao_baguncado/data/models/todo_model.dart';
 
 class TodoRemoteDataSource {
   final http.Client _client;

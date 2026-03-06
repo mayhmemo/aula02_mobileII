@@ -1,4 +1,4 @@
-import 'package:todo_refatoracao_baguncado/data/models/todo.dart';
+import 'package:todo_refatoracao_baguncado/domain/entities/todo.dart';
 
 class TodoModel extends Todo {
   const TodoModel({

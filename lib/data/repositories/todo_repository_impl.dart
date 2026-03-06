@@ -1,8 +1,7 @@
+import 'package:todo_refatoracao_baguncado/domain/entities/todo.dart';
 import 'package:todo_refatoracao_baguncado/domain/repositories/todo_repository.dart';
 import 'package:todo_refatoracao_baguncado/data/datasources/todo_local_datasource.dart';
 import 'package:todo_refatoracao_baguncado/data/datasources/todo_remote_datasource.dart';
-
-import '../models/todo.dart';
 
 class TodoRepositoryImpl implements TodoRepository {
   final TodoRemoteDataSource _remote = TodoRemoteDataSource();
