@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../screens/todos_page.dart';
+import 'package:todo_refatoracao_baguncado/presentation/pages/todos_page.dart';
 
 class AppRoot extends StatelessWidget {
   const AppRoot({super.key});
