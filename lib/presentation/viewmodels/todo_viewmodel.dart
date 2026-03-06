@@ -1,67 +1,59 @@
 import 'package:flutter/foundation.dart';
 import 'package:todo_refatoracao_baguncado/data/repositories/todo_repository_impl.dart';
-import 'package:todo_refatoracao_baguncado/domain/entities/todo.dart';
+import 'package:todo_refatoracao_baguncado/presentation/viewmodels/todo_state.dart';
 
-class TodoViewModel extends ChangeNotifier {
-  final TodoRepositoryImpl _repo = TodoRepositoryImpl(); // bagunça: impl direto aqui
+class TodoViewModel {
+  final TodoRepositoryImpl repository;
 
-  bool isLoading = false;
-  String? errorMessage;
+  final ValueNotifier<TodoState> state = ValueNotifier(const TodoState());
 
-  final List<Todo> items = [];
-  String? lastSyncLabel;
+  TodoViewModel(this.repository);
 
   Future<void> loadTodos({bool forceRefresh = false}) async {
-    isLoading = true;
-    errorMessage = null;
-    notifyListeners();
+    state.value = state.value.copyWith(isLoading: true, error: null);
 
     try {
-      final result = await _repo.fetchTodos(forceRefresh: forceRefresh);
-      items
-        ..clear()
-        ..addAll(result.todos);
-      lastSyncLabel = result.lastSyncLabel;
+      final result = await repository.fetchTodos(forceRefresh: forceRefresh);
+      state.value = state.value.copyWith(todos: result.todos, lastSyncLabel: result.lastSyncLabel);
     } catch (e) {
-      errorMessage = 'Falha ao carregar: $e';
+      state.value = state.value.copyWith(error: 'Falha ao carregar: $e');
     } finally {
-      isLoading = false;
-      notifyListeners();
+      state.value = state.value.copyWith(isLoading: false);
     }
   }
 
   Future<void> addTodo(String title) async {
     // validação mínima fica no VM (ok)
     if (title.trim().isEmpty) {
-      errorMessage = 'Título não pode ser vazio.';
-      notifyListeners();
+      state.value = state.value.copyWith(error: 'Título não pode ser vazio.');
       return;
     }
+
     try {
-      final created = await _repo.addTodo(title);
-      items.insert(0, created);
-      notifyListeners();
+      final created = await repository.addTodo(title);
+      final todos = state.value.todos;
+      todos.insert(0, created);
+      state.value = state.value.copyWith(todos: todos);
     } catch (e) {
-      errorMessage = 'Falha ao adicionar: $e';
-      notifyListeners();
+      state.value = state.value.copyWith(error: 'Falha ao adicionar: $e');
     }
   }
 
   Future<void> toggleCompleted(int id, bool completed) async {
-    final idx = items.indexWhere((t) => t.id == id);
+    final todos = state.value.todos;
+    final idx = todos.indexWhere((t) => t.id == id);
     if (idx < 0) return;
 
-    final old = items[idx];
-    items[idx] = old.copyWith(completed: completed);
-    notifyListeners();
+    final old = todos[idx];
+    todos[idx] = old.copyWith(completed: completed);
+    state.value = state.value.copyWith(todos: todos);
 
     try {
-      await _repo.updateCompleted(id: id, completed: completed);
+      await repository.updateCompleted(id: id, completed: completed);
     } catch (e) {
       // rollback
-      items[idx] = old;
-      errorMessage = 'Falha ao atualizar: $e';
-      notifyListeners();
+      todos[idx] = old;
+      state.value = state.value.copyWith(todos: todos, error: 'Falha ao atualizar: $e');
     }
   }
 }
