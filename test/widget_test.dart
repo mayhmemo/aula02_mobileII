@@ -7,13 +7,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:aula02/main.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_refatoracao_baguncado/presentation/ui/app_root.dart';
+import 'package:todo_refatoracao_baguncado/presentation/viewmodels/todo_viewmodel.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => TodoViewModel()),
+        ],
+        child: const AppRoot(),
+      ),
+    );
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
