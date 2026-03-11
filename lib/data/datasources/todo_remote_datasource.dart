@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:todo_refatoracao_baguncado/core/network/http_client.dart';
 import 'package:todo_refatoracao_baguncado/data/models/todo_model.dart';
 
 class TodoRemoteDataSource {
-  final http.Client _client;
-  TodoRemoteDataSource([http.Client? client]) : _client = client ?? http.Client();
+  final HttpClient _client;
+
+  TodoRemoteDataSource(this._client);
 
   Future<List<TodoModel>> fetchTodos() async {
     final uri = Uri.parse('https://jsonplaceholder.typicode.com/todos?_limit=20');
