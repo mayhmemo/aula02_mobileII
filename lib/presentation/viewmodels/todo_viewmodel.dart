@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:todo_refatoracao_baguncado/core/errors/app_error.dart';
 import 'package:todo_refatoracao_baguncado/data/repositories/todo_repository_impl.dart';
 import 'package:todo_refatoracao_baguncado/presentation/viewmodels/todo_state.dart';
 
@@ -15,6 +16,8 @@ class TodoViewModel {
     try {
       final result = await repository.fetchTodos(forceRefresh: forceRefresh);
       state.value = state.value.copyWith(todos: result.todos, lastSyncLabel: result.lastSyncLabel);
+    } on AppError catch (error) {
+      state.value = state.value.copyWith(error: 'Falha ao carregar: ${error.message}');
     } catch (e) {
       state.value = state.value.copyWith(error: 'Falha ao carregar: $e');
     } finally {
@@ -34,6 +37,8 @@ class TodoViewModel {
       final todos = state.value.todos;
       todos.insert(0, created);
       state.value = state.value.copyWith(todos: todos);
+    } on AppError catch (error) {
+      state.value = state.value.copyWith(error: 'Falha ao adicionar: ${error.message}');
     } catch (e) {
       state.value = state.value.copyWith(error: 'Falha ao adicionar: $e');
     }
@@ -50,6 +55,9 @@ class TodoViewModel {
 
     try {
       await repository.updateCompleted(id: id, completed: completed);
+    } on AppError catch (error) {
+      todos[idx] = old;
+      state.value = state.value.copyWith(todos: todos, error: 'Falha ao atualizar: ${error.message}');
     } catch (e) {
       // rollback
       todos[idx] = old;
