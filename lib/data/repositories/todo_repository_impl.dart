@@ -1,11 +1,17 @@
+import 'package:todo_refatoracao_baguncado/core/network/http_client.dart';
+import 'package:todo_refatoracao_baguncado/data/network/http_client_impl.dart';
 import 'package:todo_refatoracao_baguncado/domain/entities/todo.dart';
 import 'package:todo_refatoracao_baguncado/domain/repositories/todo_repository.dart';
 import 'package:todo_refatoracao_baguncado/data/datasources/todo_local_datasource.dart';
 import 'package:todo_refatoracao_baguncado/data/datasources/todo_remote_datasource.dart';
 
 class TodoRepositoryImpl implements TodoRepository {
-  final TodoRemoteDataSource _remote = TodoRemoteDataSource();
-  final TodoLocalDataSource _local = TodoLocalDataSource();
+  final TodoRemoteDataSource _remote;
+  final TodoLocalDataSource _local;
+
+  TodoRepositoryImpl({HttpClient? client})
+      : _remote = TodoRemoteDataSource(client ?? HttpClientImpl()),
+        _local = TodoLocalDataSource();
 
   @override
   Future<TodoFetchResult> fetchTodos({bool forceRefresh = false}) async {
